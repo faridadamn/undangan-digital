@@ -1,0 +1,791 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A96E;--gold-light:#F0DFB8;--gold-dark:#8B6914;
+  --cream:#FAF7F2;--dark:#1A1410;--text:#3D2E1E;--muted:#8B7355;
+  --white:#FFFFFF;--border:#E8DDD0;
+  --green:#2D5A27;--green-light:#EAF3DE;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
+h1,h2,h3{font-family:'Playfair Display',serif}
+
+.app{min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold-dark);letter-spacing:0.5px}
+.nav-steps{display:flex;gap:4px;align-items:center}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all 0.3s;cursor:pointer}
+.step-dot.active{background:var(--gold);width:24px;border-radius:4px}
+.step-dot.done{background:var(--gold-light)}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;flex:1;animation:fadeIn 0.4s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* LANDING */
+.landing{background:var(--white);align-items:center;justify-content:center;text-align:center;padding:3rem 2rem;flex:1}
+.landing-icon{font-size:48px;margin-bottom:1rem}
+.landing h1{font-size:36px;color:var(--text);margin-bottom:0.5rem;line-height:1.2}
+.landing h1 em{color:var(--gold-dark);font-style:italic}
+.landing .sub{font-size:15px;color:var(--muted);max-width:400px;margin:0 auto 2rem;line-height:1.7}
+.flow-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:2.5rem}
+.flow-pill{background:var(--cream);border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--muted);font-weight:500}
+.flow-pill span{color:var(--gold-dark);margin-right:4px}
+
+/* BUTTONS */
+.btn{padding:12px 28px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--gold-dark);color:var(--white)}
+.btn-primary:hover{background:#6B4E0A}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--cream)}
+.btn-sm{padding:8px 18px;font-size:13px}
+.btn-green{background:var(--green);color:var(--white)}
+.btn-green:hover{background:#1F4019}
+
+/* FORM */
+.form-screen{padding:2rem;max-width:680px;margin:0 auto;width:100%}
+.form-header{margin-bottom:2rem}
+.form-header h2{font-size:24px;margin-bottom:6px}
+.form-header p{color:var(--muted);font-size:14px}
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.form-section-title{font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:0.8px;color:var(--gold-dark);margin-bottom:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row.single{grid-template-columns:1fr}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);outline:none;transition:border 0.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);background:var(--white)}
+.form-group textarea{resize:vertical;min-height:72px}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:1.5rem}
+
+/* TEMPLATE */
+.template-screen{padding:2rem;max-width:900px;margin:0 auto;width:100%}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:1.5rem}
+.template-card{background:var(--white);border:2px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s}
+.template-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.template-card.selected{border-color:var(--gold-dark);box-shadow:0 0 0 3px var(--gold-light)}
+.template-preview{height:160px;display:flex;align-items:center;justify-content:center;font-size:11px;position:relative;overflow:hidden}
+.tmpl-floral{background:linear-gradient(135deg,#FFF8F0,#F5E6D0)}
+.tmpl-modern{background:linear-gradient(135deg,#F0F4FF,#E0E8FF)}
+.tmpl-rustic{background:linear-gradient(135deg,#F5F0E8,#E8DDD0)}
+.tmpl-tropical{background:linear-gradient(135deg,#EAF5EA,#D0EAD0)}
+.tmpl-elegant{background:linear-gradient(135deg,#1A1410,#3D2E1E)}
+.tmpl-label{font-size:12px;padding:10px 14px;font-weight:500;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border)}
+.selected-badge{background:var(--gold-dark);color:var(--white);padding:2px 8px;border-radius:10px;font-size:11px}
+.tmpl-mini{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.tmpl-mini-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;text-align:center}
+.tmpl-mini-date{font-size:10px;opacity:0.6;text-align:center}
+.tmpl-mini-divider{width:40px;height:1px;background:currentColor;opacity:0.3}
+
+/* GENERATE */
+.generate-screen{padding:2rem;display:flex;align-items:center;justify-content:center;flex:1}
+.generate-box{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:3rem;text-align:center;max-width:420px;width:100%}
+.gen-icon{font-size:48px;margin-bottom:1rem}
+.gen-progress{background:var(--border);border-radius:10px;height:6px;margin:1.5rem 0;overflow:hidden}
+.gen-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));border-radius:10px;transition:width 0.5s ease;width:0}
+.gen-steps{text-align:left;margin-top:1rem}
+.gen-step{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:var(--muted);transition:color 0.3s}
+.gen-step.done{color:var(--green)}
+.gen-step-icon{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.gen-step.done .gen-step-icon{background:var(--green);border-color:var(--green);color:var(--white)}
+
+/* PREVIEW */
+.preview-screen{display:flex;flex-direction:column;flex:1}
+.preview-toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:10px 2rem;display:flex;align-items:center;justify-content:space-between}
+.preview-toolbar h3{font-size:15px}
+.preview-device-btns{display:flex;gap:6px}
+.dev-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.dev-btn.active{background:var(--text);color:var(--white);border-color:var(--text)}
+.preview-frame{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--cream)}
+.preview-device{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.12);transition:all 0.3s}
+.preview-device.desktop{width:100%;max-width:680px;min-height:480px}
+.preview-device.mobile{width:375px;max-width:100%;min-height:600px;border-radius:24px;border:6px solid var(--dark)}
+.inv-content{padding:2.5rem;text-align:center}
+.inv-ornament{font-size:28px;margin-bottom:0.5rem;opacity:0.7}
+.inv-bismillah{font-size:13px;color:var(--muted);margin-bottom:1.5rem;font-style:italic}
+.inv-couple{font-family:'Playfair Display',serif;font-size:26px;line-height:1.3;margin-bottom:0.5rem;color:var(--text)}
+.inv-couple em{color:var(--gold-dark)}
+.inv-couple .amp{font-style:italic;color:var(--gold)}
+.inv-divider{display:flex;align-items:center;gap:12px;margin:1.2rem auto;max-width:240px}
+.inv-divider-line{flex:1;height:1px;background:var(--gold-light)}
+.inv-divider-icon{color:var(--gold);font-size:14px}
+.inv-detail{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem}
+.inv-detail strong{color:var(--text);font-weight:500;display:block}
+.inv-venue-box{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0;font-size:13px;line-height:1.7}
+.inv-rsvp-btn{background:var(--gold-dark);color:var(--white);padding:12px 32px;border-radius:8px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:1rem}
+
+/* PUBLISH */
+.publish-screen{padding:2rem;max-width:600px;margin:0 auto;width:100%}
+.publish-options{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:1.5rem 0}
+.publish-card{background:var(--white);border:2px solid var(--border);border-radius:12px;padding:1.5rem;cursor:pointer;text-align:center;transition:all 0.2s}
+.publish-card:hover{border-color:var(--gold)}
+.publish-card.selected{border-color:var(--gold-dark)}
+.publish-card-icon{font-size:28px;margin-bottom:0.75rem}
+.publish-card h4{font-size:14px;font-weight:500;margin-bottom:4px}
+.publish-card p{font-size:12px;color:var(--muted)}
+.publish-url{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:1rem;font-size:13px}
+.publish-url span{color:var(--muted);font-family:monospace}
+.publish-url code{color:var(--gold-dark)}
+
+/* SHARE */
+.share-screen{padding:2rem;max-width:600px;margin:0 auto;width:100%}
+.share-preview-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:1.5rem 0}
+.share-preview-img{height:120px;background:linear-gradient(135deg,#FFF8F0,#F5E6D0);display:flex;align-items:center;justify-content:center}
+.share-preview-img-text{font-family:'Playfair Display',serif;font-size:15px;color:var(--text);opacity:0.7;text-align:center}
+.share-preview-info{padding:1rem 1.25rem}
+.share-channels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:1.5rem}
+.share-ch{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:11px;font-weight:500;color:var(--muted)}
+.share-ch:hover{border-color:var(--gold);color:var(--gold-dark)}
+.share-ch-icon{font-size:22px;margin-bottom:6px;display:block}
+.share-link-box{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;gap:8px;margin-top:1rem;align-items:center}
+.share-link-box input{flex:1;border:none;background:transparent;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--muted);outline:none}
+
+/* RSVP DASHBOARD */
+.rsvp-screen{padding:2rem;max-width:860px;margin:0 auto;width:100%}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:1.5rem 0}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.stat-card .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:6px}
+.stat-card .stat-val{font-size:26px;font-weight:500}
+.stat-card.green .stat-val{color:var(--green)}
+.stat-card.gold .stat-val{color:var(--gold-dark)}
+.stat-card.red .stat-val{color:#993535}
+.rsvp-table{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:1.5rem}
+.rsvp-table-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.rsvp-table table{width:100%;border-collapse:collapse;font-size:13px}
+.rsvp-table th{padding:10px 16px;text-align:left;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);background:var(--cream);border-bottom:1px solid var(--border)}
+.rsvp-table td{padding:12px 16px;border-bottom:1px solid var(--border)}
+.rsvp-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-hadir{background:var(--green-light);color:var(--green)}
+.badge-tidak{background:#FCEBEB;color:#993535}
+.badge-ragu{background:#FAEEDA;color:#854F0B}
+.filter-chips{display:flex;gap:8px}
+.chip{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.chip.active{background:var(--text);color:var(--white);border-color:var(--text)}
+
+/* RSVP FORM MODAL */
+.rsvp-modal{position:fixed;inset:0;background:rgba(26,20,16,0.6);display:none;align-items:center;justify-content:center;z-index:200;padding:1rem}
+.rsvp-modal.show{display:flex}
+.rsvp-modal-box{background:var(--white);border-radius:16px;padding:2rem;max-width:420px;width:100%;position:relative}
+.rsvp-modal-close{position:absolute;top:14px;right:14px;background:var(--cream);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px}
+
+.screen-header{margin-bottom:2rem}
+.screen-header h2{font-size:22px;margin-bottom:6px}
+.screen-header p{color:var(--muted);font-size:14px}
+
+.tag{display:inline-block;background:var(--gold-light);color:var(--gold-dark);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:0.75rem}
+</style>
+</head>
+<body>
+<div class="app">
+
+<nav class="nav">
+  <div class="nav-logo">✦ Undanganku</div>
+  <div class="nav-steps" id="navSteps"></div>
+  <div style="font-size:13px;color:var(--muted)" id="navLabel">Mulai</div>
+</nav>
+
+<!-- SCREEN 1: LANDING -->
+<div class="screen active" id="s-landing">
+<div class="landing">
+  <div class="landing-icon">💌</div>
+  <h1>Buat Undangan Digital<br><em>Yang Berkesan</em></h1>
+  <p class="sub">Buat undangan pernikahan digital elegan dalam hitungan menit. Bagikan, terima RSVP, dan kelola tamu dengan mudah.</p>
+  <div class="flow-pills">
+    <div class="flow-pill"><span>1</span>Isi Data</div>
+    <div class="flow-pill"><span>2</span>Pilih Template</div>
+    <div class="flow-pill"><span>3</span>Generate</div>
+    <div class="flow-pill"><span>4</span>Preview</div>
+    <div class="flow-pill"><span>5</span>Publish</div>
+    <div class="flow-pill"><span>6</span>Share</div>
+    <div class="flow-pill"><span>7</span>RSVP Dashboard</div>
+  </div>
+  <button class="btn btn-primary" onclick="goTo(1)">Buat Undangan Sekarang →</button>
+</div>
+</div>
+
+<!-- SCREEN 2: FORM -->
+<div class="screen" id="s-form">
+<div class="form-screen">
+  <div class="screen-header">
+    <div class="tag">Langkah 1 dari 2 — Data Undangan</div>
+    <h2>Isi Detail Pernikahan</h2>
+    <p>Lengkapi informasi untuk undangan Anda</p>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section-title">Mempelai</div>
+    <div class="form-row">
+      <div class="form-group"><label>Nama Mempelai Pria</label><input type="text" id="f-pria" value="Ahmad Farhan" placeholder="Nama lengkap..."/></div>
+      <div class="form-group"><label>Nama Mempelai Wanita</label><input type="text" id="f-wanita" value="Siti Rahayu" placeholder="Nama lengkap..."/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Nama Ayah Mempelai Pria</label><input type="text" id="f-ayah-p" value="H. Budi Santoso" /></div>
+      <div class="form-group"><label>Nama Ayah Mempelai Wanita</label><input type="text" id="f-ayah-w" value="Drs. Wahyu Prabowo" /></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section-title">Akad Nikah</div>
+    <div class="form-row">
+      <div class="form-group"><label>Tanggal Akad</label><input type="date" id="f-tgl-akad" value="2025-06-14"/></div>
+      <div class="form-group"><label>Waktu Akad</label><input type="time" id="f-jam-akad" value="08:00"/></div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group"><label>Lokasi Akad</label><input type="text" id="f-lokasi-akad" value="Masjid Raya Al-Falah, Jl. Merdeka No. 12, Jakarta Selatan"/></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-section-title">Resepsi</div>
+    <div class="form-row">
+      <div class="form-group"><label>Tanggal Resepsi</label><input type="date" id="f-tgl-resepsi" value="2025-06-14"/></div>
+      <div class="form-group"><label>Waktu Resepsi</label><input type="time" id="f-jam-resepsi" value="11:00"/></div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group"><label>Lokasi Resepsi</label><input type="text" id="f-lokasi-resepsi" value="Grand Ballroom Hotel Bidakara, Jl. Jend. Gatot Subroto, Jakarta"/></div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group"><label>Pesan / Quotes</label><textarea id="f-pesan" rows="2">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup..." (QS Ar-Rum: 21)</textarea></div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-outline" onclick="goTo(0)">← Kembali</button>
+    <button class="btn btn-primary" onclick="goTo(2)">Pilih Template →</button>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 3: TEMPLATE -->
+<div class="screen" id="s-template">
+<div class="template-screen">
+  <div class="screen-header">
+    <div class="tag">Langkah 2 dari 2 — Desain</div>
+    <h2>Pilih Template</h2>
+    <p>Klik template untuk memilih, lalu klik Generate Undangan</p>
+  </div>
+  <div class="template-grid" id="templateGrid">
+    <div class="template-card" onclick="selectTemplate(0)">
+      <div class="template-preview tmpl-floral">
+        <div class="tmpl-mini" style="color:#3D2E1E">
+          <div style="font-size:20px">🌸</div>
+          <div class="tmpl-mini-name">Floral Romance</div>
+          <div class="tmpl-mini-divider"></div>
+          <div class="tmpl-mini-date">Ahmad & Siti</div>
+        </div>
+      </div>
+      <div class="tmpl-label">Floral Romance <span class="selected-badge" style="display:none">✓ Dipilih</span></div>
+    </div>
+    <div class="template-card" onclick="selectTemplate(1)">
+      <div class="template-preview tmpl-modern">
+        <div class="tmpl-mini" style="color:#1A2E5A">
+          <div style="font-size:20px">◈</div>
+          <div class="tmpl-mini-name">Modern Minimal</div>
+          <div class="tmpl-mini-divider"></div>
+          <div class="tmpl-mini-date">Ahmad & Siti</div>
+        </div>
+      </div>
+      <div class="tmpl-label">Modern Minimal <span class="selected-badge" style="display:none">✓ Dipilih</span></div>
+    </div>
+    <div class="template-card" onclick="selectTemplate(2)">
+      <div class="template-preview tmpl-rustic">
+        <div class="tmpl-mini" style="color:#5A3D1A">
+          <div style="font-size:20px">🍃</div>
+          <div class="tmpl-mini-name">Rustic Garden</div>
+          <div class="tmpl-mini-divider"></div>
+          <div class="tmpl-mini-date">Ahmad & Siti</div>
+        </div>
+      </div>
+      <div class="tmpl-label">Rustic Garden <span class="selected-badge" style="display:none">✓ Dipilih</span></div>
+    </div>
+    <div class="template-card" onclick="selectTemplate(3)">
+      <div class="template-preview tmpl-tropical">
+        <div class="tmpl-mini" style="color:#1A4A1A">
+          <div style="font-size:20px">🌿</div>
+          <div class="tmpl-mini-name">Tropical Lush</div>
+          <div class="tmpl-mini-divider"></div>
+          <div class="tmpl-mini-date">Ahmad & Siti</div>
+        </div>
+      </div>
+      <div class="tmpl-label">Tropical Lush <span class="selected-badge" style="display:none">✓ Dipilih</span></div>
+    </div>
+    <div class="template-card" onclick="selectTemplate(4)">
+      <div class="template-preview tmpl-elegant">
+        <div class="tmpl-mini" style="color:#F0DFB8">
+          <div style="font-size:20px">✦</div>
+          <div class="tmpl-mini-name" style="color:#C9A96E">Dark Elegant</div>
+          <div class="tmpl-mini-divider" style="background:#C9A96E"></div>
+          <div class="tmpl-mini-date">Ahmad & Siti</div>
+        </div>
+      </div>
+      <div class="tmpl-label">Dark Elegant <span class="selected-badge" style="display:none">✓ Dipilih</span></div>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-outline" onclick="goTo(1)">← Kembali</button>
+    <button class="btn btn-primary" id="btnGenerate" onclick="goTo(3)" disabled>Generate Undangan →</button>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 4: GENERATE -->
+<div class="screen" id="s-generate">
+<div class="generate-screen">
+  <div class="generate-box">
+    <div class="gen-icon" id="genIcon">✨</div>
+    <h2 style="font-size:20px;margin-bottom:6px" id="genTitle">Membuat Undangan...</h2>
+    <p style="font-size:13px;color:var(--muted)" id="genSubtitle">Menyusun elemen undangan Anda</p>
+    <div class="gen-progress"><div class="gen-bar" id="genBar"></div></div>
+    <div class="gen-steps">
+      <div class="gen-step" id="gs1"><div class="gen-step-icon" id="gsi1"></div> Memproses data undangan</div>
+      <div class="gen-step" id="gs2"><div class="gen-step-icon" id="gsi2"></div> Menerapkan template desain</div>
+      <div class="gen-step" id="gs3"><div class="gen-step-icon" id="gsi3"></div> Mengoptimalkan tampilan mobile</div>
+      <div class="gen-step" id="gs4"><div class="gen-step-icon" id="gsi4"></div> Menyiapkan sistem RSVP</div>
+      <div class="gen-step" id="gs5"><div class="gen-step-icon" id="gsi5"></div> Finalisasi undangan</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 5: PREVIEW -->
+<div class="screen" id="s-preview">
+<div class="preview-toolbar">
+  <div>
+    <h3 style="margin-bottom:2px">Preview Undangan</h3>
+    <p style="font-size:12px;color:var(--muted)">Tampilan undangan Anda</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="preview-device-btns">
+      <button class="dev-btn active" onclick="setDevice('desktop',this)">🖥 Desktop</button>
+      <button class="dev-btn" onclick="setDevice('mobile',this)">📱 Mobile</button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="goTo(5)">Publish Sekarang →</button>
+  </div>
+</div>
+<div class="preview-frame">
+  <div class="preview-device desktop" id="previewDevice">
+    <div class="inv-content" id="invContent"></div>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 6: PUBLISH -->
+<div class="screen" id="s-publish">
+<div class="publish-screen">
+  <div class="screen-header">
+    <div class="tag">Langkah 5 — Publish</div>
+    <h2>Publish Undangan</h2>
+    <p>Pilih tipe akses dan aktifkan undangan Anda</p>
+  </div>
+  <div class="publish-options">
+    <div class="publish-card selected" onclick="selectPublish(this)">
+      <div class="publish-card-icon">🌐</div>
+      <h4>Public Link</h4>
+      <p>Siapa saja bisa membuka dengan link</p>
+    </div>
+    <div class="publish-card" onclick="selectPublish(this)">
+      <div class="publish-card-icon">🔒</div>
+      <h4>Private (Password)</h4>
+      <p>Tamu perlu password untuk membuka</p>
+    </div>
+    <div class="publish-card" onclick="selectPublish(this)">
+      <div class="publish-card-icon">📋</div>
+      <h4>Whitelist Tamu</h4>
+      <p>Hanya tamu yang didaftarkan</p>
+    </div>
+    <div class="publish-card" onclick="selectPublish(this)">
+      <div class="publish-card-icon">📅</div>
+      <h4>Jadwal Rilis</h4>
+      <p>Aktif otomatis pada tanggal tertentu</p>
+    </div>
+  </div>
+  <div class="form-section" style="margin-top:0">
+    <div class="form-section-title">URL Undangan</div>
+    <div class="publish-url">
+      <span>undanganku.id/<code>ahmad-siti-2025</code></span>
+      <button class="btn btn-sm btn-outline" onclick="copyUrl()">Salin</button>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <div class="form-group" style="flex:1"><label>Nama URL Kustom</label><input type="text" value="ahmad-siti-2025"/></div>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-outline" onclick="goTo(4)">← Preview</button>
+    <button class="btn btn-green" onclick="publishAndGo()">🚀 Publish Sekarang!</button>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 7: SHARE -->
+<div class="screen" id="s-share">
+<div class="share-screen">
+  <div class="screen-header">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#EAF3DE;padding:6px 14px;border-radius:20px;margin-bottom:0.75rem">
+      <span style="font-size:14px">✅</span>
+      <span style="font-size:12px;font-weight:500;color:var(--green)">Undangan berhasil dipublish!</span>
+    </div>
+    <h2>Bagikan Undangan</h2>
+    <p>Sebarkan undangan ke para tamu undangan Anda</p>
+  </div>
+  <div class="share-preview-card">
+    <div class="share-preview-img">
+      <div class="share-preview-img-text">
+        <div style="font-size:13px">🌸</div>
+        <div style="font-family:'Playfair Display',serif">Ahmad Farhan & Siti Rahayu</div>
+        <div style="font-size:11px;margin-top:4px;opacity:0.6">14 Juni 2025</div>
+      </div>
+    </div>
+    <div class="share-preview-info">
+      <div style="font-weight:500;font-size:14px;margin-bottom:2px">Undangan Pernikahan Ahmad & Siti</div>
+      <div style="font-size:12px;color:var(--muted)">undanganku.id/ahmad-siti-2025</div>
+    </div>
+  </div>
+  <div class="share-channels">
+    <div class="share-ch" onclick="shareToast('WhatsApp')"><span class="share-ch-icon">💬</span>WhatsApp</div>
+    <div class="share-ch" onclick="shareToast('Instagram')"><span class="share-ch-icon">📸</span>Instagram</div>
+    <div class="share-ch" onclick="shareToast('Email')"><span class="share-ch-icon">📧</span>Email</div>
+    <div class="share-ch" onclick="shareToast('Telegram')"><span class="share-ch-icon">✈️</span>Telegram</div>
+    <div class="share-ch" onclick="shareToast('Facebook')"><span class="share-ch-icon">👥</span>Facebook</div>
+    <div class="share-ch" onclick="shareToast('Twitter')"><span class="share-ch-icon">🐦</span>Twitter</div>
+    <div class="share-ch" onclick="shareToast('QR Code')"><span class="share-ch-icon">⬛</span>QR Code</div>
+    <div class="share-ch" onclick="shareToast('Unduh PDF')"><span class="share-ch-icon">📄</span>Download</div>
+  </div>
+  <div style="margin-top:1.5rem">
+    <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:8px">Link Undangan</div>
+    <div class="share-link-box">
+      <input type="text" value="https://undanganku.id/ahmad-siti-2025" readonly/>
+      <button class="btn btn-sm btn-outline" onclick="copyUrl()">Salin</button>
+    </div>
+  </div>
+  <div class="form-actions" style="margin-top:2rem">
+    <button class="btn btn-primary" onclick="goTo(7)">Lihat RSVP Dashboard →</button>
+  </div>
+</div>
+</div>
+
+<!-- SCREEN 8: RSVP DASHBOARD -->
+<div class="screen" id="s-rsvp">
+<div class="rsvp-screen">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:0.5rem">
+    <div>
+      <div class="tag">Live Dashboard</div>
+      <h2 style="font-size:22px">RSVP Dashboard</h2>
+      <p style="color:var(--muted);font-size:13px">Ahmad Farhan & Siti Rahayu — 14 Juni 2025</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline btn-sm" onclick="addDemoRsvp()">+ Simulasi RSVP</button>
+      <button class="btn btn-sm" style="background:var(--cream);border:1px solid var(--border)">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Diundang</div><div class="stat-val" id="stat-total">0</div></div>
+    <div class="stat-card green"><div class="stat-label">✓ Hadir</div><div class="stat-val" id="stat-hadir">0</div></div>
+    <div class="stat-card red"><div class="stat-label">✕ Tidak Hadir</div><div class="stat-val" id="stat-tidak">0</div></div>
+    <div class="stat-card gold"><div class="stat-label">⌛ Belum Konfirm</div><div class="stat-val" id="stat-pending">0</div></div>
+  </div>
+
+  <!-- Response Rate Bar -->
+  <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px">
+      <span style="font-weight:500">Response Rate</span>
+      <span style="color:var(--muted)" id="rateLabel">0%</span>
+    </div>
+    <div style="background:var(--border);border-radius:6px;height:10px;overflow:hidden;display:flex">
+      <div id="barHadir" style="background:var(--green);height:100%;transition:width 0.5s;width:0"></div>
+      <div id="barTidak" style="background:#E24B4A;height:100%;transition:width 0.5s;width:0"></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--muted)">
+      <span>🟢 Hadir</span><span>🔴 Tidak Hadir</span><span>⬜ Belum Konfirm</span>
+    </div>
+  </div>
+
+  <div class="rsvp-table">
+    <div class="rsvp-table-header">
+      <span style="font-size:14px;font-weight:500">Daftar Tamu</span>
+      <div class="filter-chips">
+        <button class="chip active" onclick="filterRsvp('all',this)">Semua</button>
+        <button class="chip" onclick="filterRsvp('hadir',this)">Hadir</button>
+        <button class="chip" onclick="filterRsvp('tidak',this)">Tidak</button>
+        <button class="chip" onclick="filterRsvp('pending',this)">Pending</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Tamu</th>
+          <th>Jumlah</th>
+          <th>Status</th>
+          <th>Pesan</th>
+          <th>Waktu</th>
+        </tr>
+      </thead>
+      <tbody id="rsvpBody"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- RSVP Modal -->
+<div class="rsvp-modal" id="rsvpModal">
+<div class="rsvp-modal-box">
+  <button class="rsvp-modal-close" onclick="closeModal()">✕</button>
+  <h3 style="margin-bottom:4px">Form RSVP Tamu</h3>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem">Konfirmasi kehadiran Anda</p>
+  <div class="form-group" style="margin-bottom:12px"><label>Nama Lengkap</label><input type="text" id="rsvp-name" placeholder="Nama Anda..."/></div>
+  <div class="form-group" style="margin-bottom:12px"><label>Jumlah Tamu</label><select id="rsvp-count"><option>1 orang</option><option>2 orang</option><option>3 orang</option><option>4+ orang</option></select></div>
+  <div class="form-group" style="margin-bottom:12px"><label>Konfirmasi Kehadiran</label>
+    <select id="rsvp-status"><option value="hadir">✓ Insya Allah Hadir</option><option value="tidak">✕ Tidak Bisa Hadir</option><option value="pending">⌛ Belum Pasti</option></select>
+  </div>
+  <div class="form-group" style="margin-bottom:1.5rem"><label>Ucapan & Doa</label><textarea id="rsvp-msg" rows="2" placeholder="Tulis ucapan..."></textarea></div>
+  <button class="btn btn-primary" style="width:100%" onclick="submitRsvp()">Kirim Konfirmasi</button>
+</div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;z-index:999;pointer-events:none"></div>
+
+<script>
+const SCREENS=['landing','form','template','generate','preview','publish','share','rsvp'];
+const LABELS=['Mulai','Data','Template','Generate','Preview','Publish','Share','RSVP'];
+let currentScreen=0;
+let selectedTemplate=-1;
+let rsvpData=[];
+let filterState='all';
+
+const demoRsvp=[
+  {name:'Budi Setiawan',count:'2 orang',status:'hadir',msg:'Selamat menempuh hidup baru! Semoga sakinah mawaddah warahmah 🤲',time:'2 jam lalu'},
+  {name:'Dewi Kartika',count:'3 orang',status:'hadir',msg:'Barakallahu lakuma wa baraka alaikuma wa jama\'a bainakuma fi khair',time:'4 jam lalu'},
+  {name:'Rizki Pratama',count:'1 orang',status:'tidak',msg:'Mohon maaf tidak bisa hadir, ada acara keluarga',time:'5 jam lalu'},
+  {name:'Ani Susanti',count:'2 orang',status:'hadir',msg:'Waaah senang sekali! Sudah tidak sabar bertemu 😊',time:'6 jam lalu'},
+  {name:'Hendra Kurniawan',count:'4+ orang',status:'pending',msg:'Nanti saya konfirmasi lagi ya',time:'8 jam lalu'},
+];
+
+function buildNav(){
+  const nav=document.getElementById('navSteps');
+  nav.innerHTML=SCREENS.map((s,i)=>`<div class="step-dot ${i===currentScreen?'active':i<currentScreen?'done':''}" onclick="if(${i}<=${currentScreen})goTo(${i})" title="${LABELS[i]}"></div>`).join('');
+  document.getElementById('navLabel').textContent=LABELS[currentScreen];
+}
+
+function goTo(idx){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+SCREENS[idx]).classList.add('active');
+  currentScreen=idx;
+  buildNav();
+  if(idx===3)startGenerate();
+  if(idx===4)buildPreview();
+  if(idx===7)initRsvp();
+  window.scrollTo(0,0);
+}
+
+function selectTemplate(idx){
+  selectedTemplate=idx;
+  document.querySelectorAll('.template-card').forEach((c,i)=>{
+    c.classList.toggle('selected',i===idx);
+    c.querySelector('.selected-badge').style.display=i===idx?'inline-block':'none';
+  });
+  document.getElementById('btnGenerate').disabled=false;
+}
+
+function startGenerate(){
+  const bar=document.getElementById('genBar');
+  const steps=['gs1','gs2','gs3','gs4','gs5'];
+  const icons=['gsi1','gsi2','gsi3','gsi4','gsi5'];
+  let progress=0;
+  steps.forEach(s=>document.getElementById(s).classList.remove('done'));
+  bar.style.width='0';
+  document.getElementById('genTitle').textContent='Membuat Undangan...';
+  document.getElementById('genSubtitle').textContent='Menyusun elemen undangan Anda';
+  document.getElementById('genIcon').textContent='✨';
+
+  steps.forEach((s,i)=>{
+    setTimeout(()=>{
+      progress=(i+1)*20;
+      bar.style.width=progress+'%';
+      document.getElementById(s).classList.add('done');
+      document.getElementById(icons[i]).textContent='✓';
+      if(i===4){
+        document.getElementById('genTitle').textContent='Undangan Siap! 🎉';
+        document.getElementById('genSubtitle').textContent='Klik tombol di bawah untuk preview';
+        document.getElementById('genIcon').textContent='🎊';
+        setTimeout(()=>goTo(4),1200);
+      }
+    },(i+1)*700);
+  });
+}
+
+function buildPreview(){
+  const pria=document.getElementById('f-pria').value||'Ahmad Farhan';
+  const wanita=document.getElementById('f-wanita').value||'Siti Rahayu';
+  const tglAkad=formatDate(document.getElementById('f-tgl-akad').value);
+  const jamAkad=document.getElementById('f-jam-akad').value||'08:00';
+  const lokasiAkad=document.getElementById('f-lokasi-akad').value;
+  const tglResepsi=formatDate(document.getElementById('f-tgl-resepsi').value);
+  const jamResepsi=document.getElementById('f-jam-resepsi').value||'11:00';
+  const lokasiResepsi=document.getElementById('f-lokasi-resepsi').value;
+  const pesan=document.getElementById('f-pesan').value;
+
+  document.getElementById('invContent').innerHTML=`
+    <div class="inv-ornament">🌸</div>
+    <div class="inv-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:0.75rem">Dengan memohon rahmat dan ridho Allah SWT, kami mengundang Bapak/Ibu/Saudara/i</p>
+    <div class="inv-couple">
+      <em>${pria}</em><br>
+      <span class="amp">&</span><br>
+      <em>${wanita}</em>
+    </div>
+    <div class="inv-divider"><div class="inv-divider-line"></div><div class="inv-divider-icon">◈</div><div class="inv-divider-line"></div></div>
+    <div class="inv-detail">
+      <strong>Akad Nikah</strong>
+      ${tglAkad}, pukul ${jamAkad} WIB
+    </div>
+    <div class="inv-venue-box">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:4px">Lokasi Akad</div>
+      ${lokasiAkad}
+    </div>
+    <div class="inv-detail" style="margin-top:1rem">
+      <strong>Resepsi Pernikahan</strong>
+      ${tglResepsi}, pukul ${jamResepsi} WIB
+    </div>
+    <div class="inv-venue-box">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:4px">Lokasi Resepsi</div>
+      ${lokasiResepsi}
+    </div>
+    <div style="margin:1.5rem 0;padding:1rem;border-left:3px solid var(--gold);text-align:left;font-size:12px;color:var(--muted);font-style:italic;line-height:1.7">${pesan}</div>
+    <button class="inv-rsvp-btn" onclick="openModal()">💌 Konfirmasi Kehadiran (RSVP)</button>
+  `;
+}
+
+function formatDate(dateStr){
+  if(!dateStr)return '-';
+  const d=new Date(dateStr);
+  const days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function setDevice(type,btn){
+  document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const dev=document.getElementById('previewDevice');
+  dev.className='preview-device '+type;
+}
+
+function selectPublish(el){
+  document.querySelectorAll('.publish-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function publishAndGo(){
+  showToast('🚀 Undangan berhasil dipublish!');
+  setTimeout(()=>goTo(6),800);
+}
+
+function copyUrl(){showToast('✓ Link berhasil disalin!');}
+function shareToast(ch){showToast('↗ Membuka '+ch+'...');}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2500);
+}
+
+function openModal(){
+  document.getElementById('rsvpModal').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('rsvpModal').classList.remove('show');
+}
+
+function submitRsvp(){
+  const name=document.getElementById('rsvp-name').value.trim()||'Tamu Anonim';
+  const count=document.getElementById('rsvp-count').value;
+  const status=document.getElementById('rsvp-status').value;
+  const msg=document.getElementById('rsvp-msg').value||'—';
+  rsvpData.unshift({name,count,status,msg,time:'Baru saja'});
+  updateRsvpUI();
+  closeModal();
+  showToast('✓ RSVP berhasil dikirim!');
+  document.getElementById('rsvp-name').value='';
+  document.getElementById('rsvp-msg').value='';
+}
+
+function initRsvp(){
+  if(rsvpData.length===0){
+    rsvpData=[...demoRsvp];
+  }
+  updateRsvpUI();
+}
+
+function addDemoRsvp(){
+  const names=['Sinta Dewi','Joko Widodo','Maria Ulfa','Agus Salim','Fitri Handayani','Bambang Purnomo'];
+  const statuses=['hadir','hadir','hadir','tidak','pending'];
+  const msgs=['Semoga menjadi keluarga sakinah!','Barakallah!','Wah selamat ya!','Maaf berhalangan hadir','Nanti saya kabari'];
+  const r=Math.floor(Math.random()*names.length);
+  const rs=Math.floor(Math.random()*statuses.length);
+  const rm=Math.floor(Math.random()*msgs.length);
+  rsvpData.unshift({name:names[r],count:(Math.floor(Math.random()*3)+1)+' orang',status:statuses[rs],msg:msgs[rm],time:'Baru saja'});
+  updateRsvpUI();
+  showToast('✓ RSVP baru masuk!');
+}
+
+function updateRsvpUI(){
+  const total=rsvpData.length;
+  const hadir=rsvpData.filter(r=>r.status==='hadir').length;
+  const tidak=rsvpData.filter(r=>r.status==='tidak').length;
+  const pending=rsvpData.filter(r=>r.status==='pending').length;
+
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-hadir').textContent=hadir;
+  document.getElementById('stat-tidak').textContent=tidak;
+  document.getElementById('stat-pending').textContent=pending;
+
+  const responded=hadir+tidak;
+  const rate=total>0?Math.round((responded/total)*100):0;
+  document.getElementById('rateLabel').textContent=rate+'% response rate';
+  document.getElementById('barHadir').style.width=(total>0?(hadir/total*100):0)+'%';
+  document.getElementById('barTidak').style.width=(total>0?(tidak/total*100):0)+'%';
+
+  renderTable();
+}
+
+function filterRsvp(state,btn){
+  filterState=state;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function renderTable(){
+  const filtered=filterState==='all'?rsvpData:rsvpData.filter(r=>r.status===filterState);
+  const tbody=document.getElementById('rsvpBody');
+  if(filtered.length===0){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-size:13px">Belum ada data</td></tr>';
+    return;
+  }
+  tbody.innerHTML=filtered.map(r=>`
+    <tr>
+      <td style="font-weight:500">${r.name}</td>
+      <td style="color:var(--muted)">${r.count}</td>
+      <td><span class="badge badge-${r.status}">${r.status==='hadir'?'✓ Hadir':r.status==='tidak'?'✕ Tidak':'⌛ Pending'}</span></td>
+      <td style="color:var(--muted);font-size:12px;max-width:200px">${r.msg}</td>
+      <td style="color:var(--muted);font-size:12px;white-space:nowrap">${r.time}</td>
+    </tr>
+  `).join('');
+}
+
+buildNav();
+</script>
+</div>
+</body>
+</html>
